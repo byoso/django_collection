@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Collection</title>
+    <!-- bulma -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  </head>
+  <body>
+    <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="{% url 'home:index' %}">
+          Home
+        </a>
+      </div>
+      <div class="navbar-menu">
+        <div class="navbar-start">
+          <div class="navbar-item">
+            other
+          </div>
+        </div>
+        <div class="navbar-end">
+          <div class="navbar-item">
+            <div class="buttons">
+              {% if user.is_authenticated %}
+              <span class="mr-4">{{ user.username }}</span>
+              <a class="button is-warning is-small" href="{% url '_users:logout' %}">Logout</a>
+              {% else %}
+              <a class="button is-small" href="{% url '_users:signup' %}">
+                Sign up
+              </a>
+              <a class="button is-light is-success is-small" href="{% url '_users:login' %}">
+                Log in
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    {% if messages %}
+    <div class="container">
+      {% for message in messages %}
+      <div class="notification is-{{message.tags}} m-2">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+
+    {% endif %}
+
+    {% block content %}
+
+
+    {% endblock content %}
+  </body>
+</html>

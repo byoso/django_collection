@@ -1,0 +1,15 @@
+
+__pycache__/
+*.pyc
+*.sqlite3
+
+.venv/
+.env
+
+staticfiles
+mediafiles
+
+
+# in the apps
+_users/migrations/
+_adminplus/migrations/

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Documents</title>
+  <!-- bulma -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <!-- vue.js 3 -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <!-- markdown converter to html (cdn) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+
+<body>
+
+<div class="" id="app">
+
+  <div class="columns">
+    <aside class="menu">
+      <h1 class="title">Documents</h1>
+      <ul>
+        <li v-for="page in pages" :key="page">
+          <button @click="display(page)" class="button is-fullwidth has-text-left">[[ page.name ]]</button>
+        </li>
+        <li>
+          <br>
+          <a href="https://github.com/byoso/madoc" target="_blank">about Madoc</a>
+        </li>
+      </ul>
+
+    </aside>
+    <div class="column content-col">
+      <div class="content" v-html="content_displayed">
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+
+<script>
+  const { createApp } = Vue
+
+  createApp({
+    delimiters: ['[[', ']]'],
+    data() {
+      return {
+        uuid: "5732142a-2b88-4742-bd23-2123960343fa",
+        pages: [{"content": "\n# Frontend\n\nIf you're using a SPA, don't forget to redirect the backend url to the actual production server.\n\nExample: in my case, a vue.js app with axios.\n\n**main.js**\n```js\n// ...\naxios.defaults.baseURL = 'https://www.example.com'\n// ...\n\n```\n\nThen compile a build of the frontend app.\n\n\n# NGINX config (ssl)\n\nThe config file should look like this.\n\n**default-ssl.conf.tpl**\n```sh\n# ...\n# statics and medias are the same\n location /static {\n        alias /vol/static/static;\n    }\n\n    location /media {\n        alias /vol/static/media;\n    }\n\n# each app must have its own route, they can have the same settings\n    location /admin {\n        uwsgi_pass                  ${APP_HOST}:${APP_PORT};\n        include                     /etc/nginx/uwsgi_params;\n        client_max_body_size        ${MAX_UPLOAD_SIZE}M;\n    }\n\n    location /app1 {\n        uwsgi_pass                  ${APP_HOST}:${APP_PORT};\n        include                     /etc/nginx/uwsgi_params;\n        client_max_body_size        ${MAX_UPLOAD_SIZE}M;\n    }\n\n    location /app2 {\n        uwsgi_pass                  ${APP_HOST}:${APP_PORT};\n        include                     /etc/nginx/uwsgi_params;\n        client_max_body_size        ${MAX_UPLOAD_SIZE}M;\n    }\n\n# serves index.html at /, assuming this file is in static/dist/\n    location / {\n        root /vol/static/static/dist;\n        index index.html;\n```\n\n", "name": "01.5 SPA"}, {"content": "## Ressources\n[Video 01 - overhaul](https://www.youtube.com/watch?v=mScd-Pc_pX0)\n[Video 02 - SSL certificate](https://www.youtube.com/watch?v=3_ZJWlf25bY&t=3204s)\n[same with text](https://londonappdeveloper.com/django-docker-deployment-with-https-using-letsencrypt/)\n\n## build the docker images\n\n\n```sh\n# get the initial ssl certifcate\ndocker-compose -f docker-compose.prod.yml run --rm certbot /opt/certify-init.sh\n# Waiting for nginx to be available... can appear for a while, don't worry, just wait a little.\n\n# then down\ndocker-compose -f docker-compose.prod.yml down\n# and re-up for good\ndocker-compose -f docker-compose.prod.yml up -d\n\n```\n\n## CRON automatic certificate renewal\n\n### manual renewal\n\nFor now, the certificate can be manually renewed with:\n\n```sh\ndocker-compose -f docker-compose.prod.yml run --rm certbot sh -c \"certbot renew\"\n```\n\n### CRON renewal\n\nWe want the certificate to automatically renew, so, we'll make a cron for that.\n\nIn the /home directory of the server (where you can find your main code directory), create a new file: 'renew.sh'\n\n**renew.sh**\n\n*replace {docker-compose place} by the place given by `whereis docker-compose` (example: /usr/bin/docker-compose)**\n\n```sh\n#! /bin/sh\n\nset -e\n\necho \"$(date): Tried to launch renew.sh script from cron...\" 5732142a-2b88-4742-bd23-2123960343fa>5732142a-2b88-4742-bd23-2123960343fa> /home/<5732142a-2b88-4742-bd23-2123960343fauser5732142a-2b88-4742-bd23-2123960343fa>/logs\n\ncd /home/<5732142a-2b88-4742-bd23-2123960343fauser5732142a-2b88-4742-bd23-2123960343fa>/<5732142a-2b88-4742-bd23-2123960343faproject folder5732142a-2b88-4742-bd23-2123960343fa>\n\n# do: 'whereis docker-compose' to have the right path to docker-compose\n/usr/bin/docker-compose -f docker-compose.prod.yml run --rm certbot certbot renew\n\n# add a trace to logs\necho \"$(date): SSL certificate renewe successfully\" 5732142a-2b88-4742-bd23-2123960343fa>5732142a-2b88-4742-bd23-2123960343fa> /home/byoso/logs\n\n\n```\n\nMake sure it is executable: `sudo chmod +x renew.sh`\n\nTry if it works: `./renew.sh`\n\n\nthen create a crontab (as normal user, not sudo):\n```sh\ncrontab -e\n```\n\nregister this line:\n\n```sh\n0 0 * * 6 sh /home/<5732142a-2b88-4742-bd23-2123960343fauser5732142a-2b88-4742-bd23-2123960343fa>/renew.sh\n```\n*0 0 * * 6  means:  every saturday at midnight* ([crontab.guru here](https://crontab.guru))\n", "name": "04 Deploy with docker and docker-compose"}, {"content": "\n## Be sure you have a ssh-key\n\n- If you DO NOT already have an ssh-key on your local machine in `~/.ssh`, do\n\n```sh\n$ ssh-keygen\n```\nnote: DO NOT DO IT IF YOU ALREADY HAVE ONE\n\n- Register your key (`cat ~/.ssh/id_rsa.pub`) within your DigitalOcean project if not already done (settings-5732142a-2b88-4742-bd23-2123960343fa>security).\n\n## Create a new droplet (or server if not DigitalOcean)\n\nChoose \"docker on Ubuntu\" as an OS on the 'Marketplace', and the size of server you want.\n\n## Create a non-root user on the server\n\n- then:\n\n```sh\n$ ssh root@<5732142a-2b88-4742-bd23-2123960343faIP adress5732142a-2b88-4742-bd23-2123960343fa>\n$ adduser <5732142a-2b88-4742-bd23-2123960343fauser5732142a-2b88-4742-bd23-2123960343fa>\n$ usermod -aG sudo <5732142a-2b88-4742-bd23-2123960343fauser5732142a-2b88-4742-bd23-2123960343fa>\n$ user -aG docker <5732142a-2b88-4742-bd23-2123960343fauser5732142a-2b88-4742-bd23-2123960343fa>\nmkdir -p /home/<5732142a-2b88-4742-bd23-2123960343fauser5732142a-2b88-4742-bd23-2123960343fa>/.ssh\ntouch /home/<5732142a-2b88-4742-bd23-2123960343fauser5732142a-2b88-4742-bd23-2123960343fa>/.ssh/authorized_keys\nnano /home/<5732142a-2b88-4742-bd23-2123960343fauser5732142a-2b88-4742-bd23-2123960343fa>/.ssh/authorized_keys\n```\n\n- open a second terminal and:\n```sh\ncat ~/.ssh/id_rsa.pub\n```\n\n- Copy/paste the output of this command in the nano editor of the distant terminal, save it,  and close this local terminal.\n\n- In the distant terminal, still logged in:\n```sh\nexit\nssh <5732142a-2b88-4742-bd23-2123960343fauser5732142a-2b88-4742-bd23-2123960343fa>@<5732142a-2b88-4742-bd23-2123960343faIP adress5732142a-2b88-4742-bd23-2123960343fa>\nsudo apt update\nsudo apt install docker-compose\nsudo apt upgrade -y # may be long and ask a few default choices\n```\n\nYou can now log in the server with ssh as a normal user :)\n\n## Set the firewall of the server\n\n```sh\nsudo ufw app list\nsudo ufw allow OpenSSH\nsudo ufw enable\nsudo ufw status\n```\n\n## Add a key for github\n\n```sh\nsudo ssh-keygen -t ed25519 -C \"Github Deploy Key\"\n# then leave the default locations, and blank password (useless)\nsudo cp /root/.ssh/id_ed25519.pub ~/.ssh/id_ed25519.pub\ncat ~/.ssh/id_ed25519.pub\n```\n\nCopy the output, go in the github repository, \"setting/deploy keys\",  \"+add a deploy key\" paste the key, and name it.\n\n## git clone\n\nIn git repository, copy the clone link\n\nthen on the server:\n\n```sh\nsudo git clone git@github.com:your/project...\ncd <5732142a-2b88-4742-bd23-2123960343faproject folder5732142a-2b88-4742-bd23-2123960343fa>\n\nsudo cp .env-sample .env\nsudo nano .env\n# edit the .env file\n```\n\nRead carefully each line of the .env file and set them up before going further.", "name": "03 Prepare the server on DigitalOcean (or whatever)"}, {"content": "\n# Add dotenv to your project\n\n`pip install djang-dotenv`\n\n**manage.py**\n```python\nimport dotenv\n# ...\nif __name__ == \"__name__\":\n    dotenv.read_dotenv()\n    main()\n```\n\n# Add the deployment files to the project\n\ndownload, copy/paste and unzip this files in the root directory of your project:\n\n[deployment_files.zip](https://github.com/byoso/deployment_django_tuto/blob/master/deployment_files.zip)\n\n- check the 'dependencies.txt', then `pip install -r dependencies.txt` and `pip freeze 5732142a-2b88-4742-bd23-2123960343fa> requirements.txt`\n- The deployment files provide a .env-sample file, use it to create your .env file, but you MUST .gitignore the .env\n## Adapt the deployment files to your project name:\n\n- in `scripts/run.sh` : \n```sh\n# ...\nuwsgi --socket :9000 --workers 4 --master --enable-threads --module _project.wsgi\n```\nchange \"\\_project\" to your actual project directory (the one that contains the wsgi.py file).\n\n# Settings.py\n\nBe sure this settings are made properly, according to your project:\n\n**settings.py**\n```python\nimport os\n\nSECRET_KEY = os.environ.get('SECRET_KEY', 'unsafe secret key')\n\nDEBUG = os.environ.get('DEBUG', '0') == '1'\n\nALLOWED_HOSTS = []\nALLOWED_HOSTS.extend(\n    filter(\n        None,  # remove empty strings from the list\n        os.environ.get('ALLOWED_HOSTS', '').split(',')\n    )\n)\n# necessary for admin login\nCSRF_TRUSTED_ORIGINS = [\n    f\"https://{os.environ.get('DOMAIN')}\",\n    f\"https://www.{os.environ.get('DOMAIN')}\",\n]\n\nINSTALLED_APPS = [\n    # ...\n    '_deployment',\n]\n\n# Database\nif os.environ.get('USE_POSTGRES', '1') == '1':\n    DATABASES = {\n        'default': {\n            'ENGINE': 'django.db.backends.postgresql',\n            'NAME': os.environ.get('POSTGRES_DB', 'django_pg_db'),\n            'USER': os.environ.get('POSTGRES_USER', 'postgres'),\n            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'postgres'),\n            'HOST': os.environ.get('POSTGRES_HOST', 'db'),\n            'PORT': os.environ.get('POSTGRES_PORT', '5432'),\n        }\n    }\nelse:\n    DATABASES = {\n        'default': {\n            'ENGINE': 'django.db.backends.sqlite3',\n            'NAME': BASE_DIR / 'db.sqlite3',\n        }\n    }\n\nSTATICFILES_DIRS = ['static/', ]\n\nSTATIC_URL = 'static/'\nMEDIA_URL = 'media/'\nDEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'\n\nif DEBUG:\n    STATIC_ROOT = 'staticfiles/'\n    MEDIA_ROOT = 'mediafiles/'\nelse:\n    STATIC_ROOT = '/vol/web/static/'\n    MEDIA_ROOT = '/vol/web/media/'\n\n# EMAIL\nif os.environ.get('EMAIL_IS_CONFIGURED', '0') == '1':\n    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'\nelse:\n    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'\nEMAIL_HOST = os.environ.get('EMAIL_HOST', \"localhost\")\nEMAIL_PORT = os.environ.get('EMAIL_PORT', \"25\")\nEMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', \"email@email.com\")\nDEFAULT_FROM_EMAIL = EMAIL_HOST_USER\nEMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', \"testpass1\")\nEMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', '0') == '1'\n\n```\n\n## STATIC_URL & MEDIA_URL\n\nIf you want to change their urls, change it both in the settings.py, and in configs/nginx/default-ssl.conf.tpl, just the location, not the volume.\n\n## .env\n\n### for development\n\nTo run the project in development mode with `./manage.py runserver`, the .env file must be set with this:\n\n**.env**\n```sh\nDEBUG=1\nUSE_POSTGRES=0\n```\n\n### for production\n\nJust read each line of the .env file carefully and set them wisely.\n\n", "name": "01 project preparation"}, {"content": "Once you have bought a domain name, you have a few things to parameter with your domain provider.\n\n# DNS settings\n\nAdd or modify a few settings\n\n| Type | Record | Value |\n| -- | -- | -- |\n|A | @ | [server's IP adresse] |\n| A | www.[your domain without .com] | [same IP here] |\n\nAAAA is for IPv6, only if you have one, otherwise just remove this AAAA entries.\n\n[Ressources LWS](https://aide.lws.fr/base/Hebergement-web-mutualise/Gestion-de-la-Zone-DNS/zones-DNS-avancees#)\n\n## Configure some emails\n\nA 'noreply' is usefull, a 'contact' redirection too...\n", "name": "02 Domain settings"}, {"content": "  \n\n# Dev mode with nginx\n\nBefore actual deployment, test your configurations with the file `docker-compose.dev.yml`\n\nfor that a few settings:\n\n**.env**\n```sh\nDEBUG=0 # so django's dev server wont run and nginx will handle the statics\nDOMAIN=localhost\nUSE_POSTGRES=1\n\n```\n\n\nChek the result at `http://0.0.0.0:80`\n", "name": "03.5 Dev with docker-compose"}],
+        content: '',
+      }
+    },
+    computed: {
+      content_displayed(){
+        return this.content
+      }
+    },
+    methods: {
+      display(page){
+        console.log('display')
+        let re = new RegExp(this.uuid, 'g')
+        this.content = marked.parse(page.content.replace(re, ""))
+      }
+    },
+    beforeMount(){
+      this.pages.sort((a, b) => {
+        if (a.name < b.name) return -1
+        if (a.name > b.name) return 1
+        return 0
+      })
+      this.display(this.pages[0])
+    }
+  }).mount('#app')
+</script>
+
+<style scoped>
+.menu {
+  position: sticky;
+  display: inline-block;
+  vertical-align: top;
+  max-height: 100vh;
+  overflow-y: auto;
+  min-width: 400px;
+  top: 0;
+  bottom: 0;
+  padding: 30px;
+}
+
+.content {
+  display: inline-block;
+  width: 80%;
+  overflow-x: scroll;
+
+}
+
+html {
+    background-color: #fbfbfb;
+}
+
+body {
+    font: 400 16px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #111;
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-feature-settings: "kern" 1;
+    -moz-font-feature-settings: "kern" 1;
+    -o-font-feature-settings: "kern" 1;
+    font-feature-settings: "kern" 1;
+    font-kerning: normal;
+    padding: 30px;
+}
+
+
+.button.has-text-left {
+  justify-content: flex-start;
+}
+
+@media only screen and (max-width: 600px) {
+    body {
+        padding: 5px;
+    }
+    body>#content {
+        padding: 0px 20px 20px 20px !important;
+    }
+}
+
+body>#content {
+    margin: 0px;
+    max-width: 900px;
+    border: 1px solid #e1e4e8;
+    padding: 10px 40px;
+    padding-bottom: 20px;
+    border-radius: 2px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+summary {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+hr {
+    color: #bbb;
+    background-color: #bbb;
+    height: 1px;
+    flex: 0 1 auto;
+    margin: 1em 0;
+    padding: 0;
+    border: none;
+}
+
+
+/**
+ * Links
+ */
+
+a {
+    color: #0366d6;
+    text-decoration: none;
+}
+
+a:visited {
+    color: #0366d6;
+}
+
+a:hover {
+    color: #0366d6;
+    text-decoration: underline;
+}
+
+pre {
+    background-color: #dbdbdb;
+    font-size: 1.1em;
+    border-radius: 3px;
+    line-height: 1.45;
+    overflow: auto;
+    padding: 16px;
+}
+
+
+/**
+  * Code blocks
+  */
+
+code {
+    background-color: rgba(27, 31, 35, .05);
+    border-radius: 3px;
+    font-size: 85%;
+    margin: 0;
+    word-wrap: break-word;
+    padding: .2em .4em;
+    font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
+}
+
+pre>code {
+    background-color: transparent;
+    border: 0;
+    display: inline;
+    line-height: inherit;
+    margin: 0;
+    overflow: visible;
+    padding: 0;
+    word-wrap: normal;
+    font-size: 100%;
+}
+
+
+/**
+ * Blockquotes
+ */
+
+blockquote {
+    margin-left: 30px;
+    margin-top: 0px;
+    margin-bottom: 16px;
+    border-left-width: 3px;
+    padding: 0 1em;
+    color: #828282;
+    border-left: 4px solid #e8e8e8;
+    padding-left: 15px;
+    font-size: 18px;
+    letter-spacing: -1px;
+    font-style: italic;
+}
+
+blockquote * {
+    font-style: normal !important;
+    letter-spacing: 0;
+    color: #6a737d !important;
+}
+
+
+/**
+ * Tables
+ */
+
+table {
+    border-spacing: 2px;
+    display: block;
+    font-size: 14px;
+    overflow: auto;
+    width: 100%;
+    margin-bottom: 16px;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+td {
+    padding: 6px 13px;
+    border: 1px solid #dfe2e5;
+}
+
+th {
+    font-weight: 600;
+    padding: 6px 13px;
+    border: 1px solid #dfe2e5;
+}
+
+tr {
+    background-color: #fff;
+    border-top: 1px solid #c6cbd1;
+}
+
+table tr:nth-child(2n) {
+    background-color: #f6f8fa;
+}
+
+
+/**
+ * Others
+ */
+
+img {
+    max-width: 100%;
+}
+
+p {
+    line-height: 24px;
+    font-weight: 400;
+    font-size: 16px;
+    color: #24292e;
+}
+
+ul {
+    margin-top: 0;
+}
+
+li {
+    color: #24292e;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+li+li {
+    margin-top: 0.25em;
+}
+
+* {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    color: #24292e;
+}
+
+a:visited {
+    color: #0366d6;
+}
+
+h1,
+h2,
+h3 {
+    border-bottom: 1px solid #eaecef;
+    color: #111;
+    /* Darker */
+}
+
+code>* {
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace !important;
+}
+
+</style>
+
+</html>
