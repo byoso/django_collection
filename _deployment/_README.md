@@ -1,6 +1,6 @@
 # For a quick deployment
 
-Install this app in your project
+Install this app in your project.
 
 **settings.py**
 ```python
@@ -9,8 +9,6 @@ INSTALLED_APPS = [
     '_deployment',
 ]
 ```
+Read the content of DOCUMENTATION/ to know how to use this.
 
-- Copy the content of 'COPY_TO_ROOT' into the root directory of your project.
-- Make a .env file from the .env-sample and ADD IT TO your .gitignore
-
-You're good to go now.
+You're good to go now !

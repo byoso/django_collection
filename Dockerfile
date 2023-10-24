@@ -2,11 +2,12 @@ FROM python:3.10.13-alpine3.18
 
 ENV PYTHONUNBUFFERED 1
 
+WORKDIR /app
+
 COPY ./requirements.txt /requirements.txt
 COPY ./ /app
 COPY ./scripts /scripts
 
-WORKDIR /app
 EXPOSE 8000
 
 RUN python -m venv /py && \

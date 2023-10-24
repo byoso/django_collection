@@ -24,6 +24,13 @@
           <div class="navbar-item">
             <div class="buttons">
               {% if user.is_authenticated %}
+
+              {% if user.is_active and user.is_staff %}
+              <a class="button is-secondary is-small" href="{% url '_adminplus:adminplus' %}">
+                <h1>Admin +</h1>
+              </a>
+              {% endif %}
+
               <span class="mr-4">{{ user.username }}</span>
               <a class="button is-warning is-small" href="{% url '_users:logout' %}">Logout</a>
               {% else %}

@@ -20,13 +20,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-n(!v_2oz+=*2bywu=-7y!26%fm86vsf1#hoccm)vlribq8+hg-'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'unsafe secret key')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', '0') == '1'
 
 ALLOWED_HOSTS = []
+ALLOWED_HOSTS.extend(
+    filter(
+        None,  # remove empty strings from the list
+        os.environ.get('ALLOWED_HOSTS', '').split(',')
+    )
+)
+# necessary for admin login
+CSRF_TRUSTED_ORIGINS = [
+    f"https://{os.environ.get('DOMAIN')}",
+    f"https://www.{os.environ.get('DOMAIN')}",
+]
 
 
 # Application definition
@@ -39,7 +48,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # locale apps
+    # local apps
+    "_adminplus",
     "_deployment",
     'app_home',
     '_users',
@@ -79,12 +89,25 @@ WSGI_APPLICATION = '_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Database
+if os.environ.get('USE_POSTGRES', '1') == '1':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('POSTGRES_DB', 'django_pg_db'),
+            'USER': os.environ.get('POSTGRES_USER', 'pg_user'),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'pg_unsafe_password'),
+            'HOST': os.environ.get('POSTGRES_HOST', 'db'),
+            'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -121,7 +144,18 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
+STATICFILES_DIRS = ['static/', ]
+
 STATIC_URL = 'static/'
+MEDIA_URL = 'media/'
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+if DEBUG:
+    STATIC_ROOT = 'staticfiles/'
+    MEDIA_ROOT = 'mediafiles/'
+else:
+    STATIC_ROOT = '/vol/web/static/'
+    MEDIA_ROOT = '/vol/web/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

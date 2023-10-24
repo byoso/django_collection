@@ -8,4 +8,4 @@ def adminplus(request):
     context = {
     }
 
-    return render(request, '_adminplus/adminplus.html', context)
+    return render(request, '_adminplus/adminplus_index.html', context)
