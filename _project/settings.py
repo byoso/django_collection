@@ -48,6 +48,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # 3rd party apps
+    # DRF
+    # 'rest_framework',
+    # 'rest_framework.authtoken',
+
+
     # local apps
     "_adminplus",
     "_deployment",
@@ -176,3 +182,11 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', "email@email.com")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', "testpass1")
 EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', '0') == '1'
+
+
+# _users (api version)
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'rest_framework.authentication.TokenAuthentication',
+#     ],
+# }

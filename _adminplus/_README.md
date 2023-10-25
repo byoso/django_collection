@@ -1,4 +1,4 @@
-# Adminplus
+# Adminplus (v1.0.0)
 
 Adds a page to the admin, can be used to add some features to the admin.
 

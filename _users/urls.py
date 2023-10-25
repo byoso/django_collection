@@ -76,7 +76,7 @@ urlpatterns = [
     # path(f'{prefix}users/', views_api.UserView.as_view(), name="users"),
     # path(f'{prefix}users/my_infos/', views_api.users_my_infos, name="users_my_infos"),
 
-    # DO NOT not use this one in production:
+    # # DO NOT not use this one in production:
     # path(f'{prefix}users/all/', views_api.get_users_all, name="get_users_all"),
 
 ]

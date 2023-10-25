@@ -1,7 +1,4 @@
-# _users
-
-WIP: 60%
-TODO: the API version
+# _users (v1.1.9)
 
 Clean django _users app with auth, classic and api included.
 
@@ -83,6 +80,13 @@ Remove `forms.py`, `views.py`, and the classic paths in `urls.py`, chek the `con
 
 **settings.py**
 ```python
+INSTALLED_APPS = [
+    # ...
+    'rest_framework',
+    'rest_framework.authtoken',
+
+]
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -107,3 +111,21 @@ API ENDPOINTS details:
 | `users/` | POST | username, email, password | - | Create a new user |
 | `users/my_infos/` | GET | - | IsAuthenticated | returns the user's infos |
 | `users/delete_me/` | DELETE | - | IsAuthenticated | deletes the user |
+
+
+## create_admin
+
+To use the command 'create_admin' in production, add
+`python manage.py create_admin` in the deploment scripts after the migrations are done.
+
+and
+
+**.env**
+```sh
+
+# default superuser (with dev server do './manage.py create_admin')
+CREATE_DJANGO_SUPERUSER=1  # 1 to enable, 0 to disable
+DJANGO_SUPERUSER_USERNAME=admin
+DJANGO_SUPERUSER_EMAIL=admin@mail.com
+DJANGO_SUPERUSER_PASSWORD=testpass1
+```
