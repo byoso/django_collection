@@ -1,4 +1,4 @@
-# Adminplus (v1.0.0)
+# Adminplus (v1.0.1)
 namespace: '_adminplus'
 
 Adds a page to the admin, can be used to add some features to the admin.
