@@ -1,4 +1,5 @@
 # _users (v1.1.9)
+namespace: '_users'
 
 Clean django _users app with auth, classic and api included.
 
@@ -16,6 +17,7 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = _users.User
+LOGIN_URL = '/auth/login/'  # or wherever is your login url
 
 # EMAIL
 if os.environ.get('EMAIL_IS_CONFIGURED', '0') == '1':

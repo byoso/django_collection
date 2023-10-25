@@ -25,7 +25,10 @@
             <div class="buttons">
               {% if user.is_authenticated %}
 
+
+
               {% if user.is_active and user.is_staff %}
+              <a class="button is-secondary is-small" href="{% url 'cdn:home' %}">CDN</a>
               <a class="button is-secondary is-small" href="{% url '_adminplus:adminplus' %}">
                 <h1>Admin +</h1>
               </a>

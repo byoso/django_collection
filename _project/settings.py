@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "_adminplus",
     "_deployment",
     'app_home',
+    'app_cdn',
     '_users',
 ]
 
@@ -150,11 +151,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
+# Statics and CDN
 STATICFILES_DIRS = ['static/', ]
 
 STATIC_URL = 'static/'
-MEDIA_URL = 'media/'
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+MEDIA_URL = 'cdn/'
 
 if DEBUG:
     STATIC_ROOT = 'staticfiles/'
@@ -163,12 +164,20 @@ else:
     STATIC_ROOT = '/vol/web/static/'
     MEDIA_ROOT = '/vol/web/media/'
 
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+# This reserved names are not allowed for cdn projects
+CDN_EXCLUDED_NAMES = [
+    'sitefiles',
+    'sitesfiles',
+]
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = '_users.User'
+LOGIN_URL = 'auth/login/'
 
 
 # EMAIL
