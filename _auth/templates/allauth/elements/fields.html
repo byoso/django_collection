@@ -1,0 +1,38 @@
+
+{% comment %}
+<!-- original allauth content for fields.html -->
+{{ attrs.form.as_p }}
+{% endcomment %}
+<br>
+<div style="color: red;">
+  {{ attrs.form.non_field_errors | safe }}
+</div>
+
+{% for elem in attrs.form %}
+  {% if elem.is_hidden %}
+    {{ elem }}
+  {% else %}
+
+    <div>
+      <p>
+
+        {% if elem.field.widget.input_type == 'text' or elem.field.widget.input_type == 'password' or elem.field.widget.input_type == 'email'%}
+
+        {% with elem as elem %}
+        {% include "allauth/elements/field.html" %}
+        {% endwith %}
+
+
+        {% else %}
+        {{ elem.label }} {{ elem }}
+        {% endif %}
+        <br>
+
+        {% if elem.help_text %}
+          <span class="helptext">{{ elem.help_text }}</span>
+        {% endif %}
+      </p>
+    </div>
+  {% endif %}
+
+{% endfor %}

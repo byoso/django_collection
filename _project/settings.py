@@ -59,7 +59,12 @@ INSTALLED_APPS = [
     "_deployment",
     'app_home',
     'app_cdn',
-    '_users',
+    '_auth',  # before allauth
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
 
 MIDDLEWARE = [
@@ -70,6 +75,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = '_project.urls'
@@ -176,9 +182,26 @@ CDN_EXCLUDED_NAMES = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = '_users.User'
-LOGIN_URL = 'auth/login/'
 
+# allauth backends
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by email
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+AUTH_USER_MODEL = '_auth.User'
+
+# allauth configuration
+LOGIN_REDIRECT_URL = '/'
+ACCOUNT_LOGOUT_REDIRECT = '/'
+ACCOUNT_SIGNUP_REDIRECT_URL = "/"
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'  # 'username' | 'email' | 'username_email'
+ACCOUNT_EMAIL_REQUIRED = True  # True if verification is 'mandatory'
+ACCOUNT_CHANGE_EMAIL = True  # True if user can change email, with a verification process
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # 'mandatory' | 'optional' | 'none'
 
 # EMAIL
 if os.environ.get('EMAIL_IS_CONFIGURED', '0') == '1':
@@ -191,11 +214,3 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', "email@email.com")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', "testpass1")
 EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', '0') == '1'
-
-
-# _users (api version)
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': [
-#         'rest_framework.authentication.TokenAuthentication',
-#     ],
-# }

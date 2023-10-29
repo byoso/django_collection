@@ -1,0 +1,21 @@
+{% load allauth %}
+
+<p>
+  <label for="{{ elem.id_for_label }}" class="label">
+    {{ elem.label }}
+  </label>
+  {% if elem.errors %}
+    <div style="color: red;">
+      {{ elem.errors | safe}}
+    </div>
+  {% endif %}
+  <input {% if elem.field.required %}required{% endif %}
+         {% if elem.field.disabled %}disabled{% endif %}
+         {% if elem.checked %}checked{% endif %}
+         {% if elem.name %}name="{{ elem.name }}"{% endif %}
+         {% if elem.id_for_label %}id="{{ elem.id_for_label }}"{% endif %}
+         {% if elem.placeholder %}placeholder="{{ elem.placeholder }}"{% else %}placeholder="{{ elem.label }}"{% endif %}
+         value="{{ elem.value|default_if_none:"" }}"
+         type="{{ elem.field.widget.input_type }}"
+         class="input">
+</p>
