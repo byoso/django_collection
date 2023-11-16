@@ -1,0 +1,18 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+<div class="container is-max-desktop">
+  <a href="{% url 'cdn:edit_item' item.id %}">Back</a>
+  <h1 class="title">Replace file</h1>
+
+  <h2 class="subtitle">Update the file at '{{ request.get_host }}{{ item.file.url }}' without breaking the link.</h2>
+
+  <form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" class="button is-success" value="Save" >
+  </form>
+</div>
+
+{% endblock content %}
