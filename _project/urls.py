@@ -24,7 +24,6 @@ urlpatterns = [
     path('', include('app_home.urls', namespace='home')),
     path('', include('_adminplus.urls', namespace='_adminplus')),
     path('app_cdn/', include('app_cdn.urls', namespace="cdn")),
-    path('', include('_auth.urls', namespace='_auth')),
     path('accounts/', include('allauth.urls')),
 ]
 

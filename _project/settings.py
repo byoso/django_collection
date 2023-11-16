@@ -59,8 +59,8 @@ INSTALLED_APPS = [
     "_deployment",
     'app_home',
     'app_cdn',
-    '_auth',  # before allauth
 
+    '_auth',  # before allauth
     'allauth',
     'allauth.account',
     'allauth.socialaccount',

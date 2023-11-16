@@ -68,7 +68,6 @@ ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # 'mandatory' | 'optional' | 'none'
 ```python
 urlpatterns = [
     # ...
-    path('', include('_auth.urls', namespace='_auth')),
     path('accounts/', include('allauth.urls')),
 ]
 ```
@@ -95,7 +94,7 @@ Don not forget to makemigrations and migrate.
 </div>
 ```
 
-# Styling tamplates
+# Styling templates
 
 You will find in _auth/templates the folder
 - 'account' (you should not need to modify it, but you can)
