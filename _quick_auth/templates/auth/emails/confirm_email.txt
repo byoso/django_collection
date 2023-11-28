@@ -6,7 +6,7 @@
 To confirm your email, please click on the following link:
 {{ link }}
 
-If you have not registered an account,
+If you have not registered a new email account,
 please ignore this message.
 
 Best regards

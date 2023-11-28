@@ -20,14 +20,17 @@ Make a `.env` file from the provided `.env-sample`.
 
 # content
 
-## __commands
+## _adminplus
 
-- create_admin : create an admin, can be used in a prod script
-- wait_for_db : used in a prod script
+Add a page to the admin, that can be used to add easily some controles to the admin.
 
-## _users (to be deprecated, better use _auth or _auth_api)
+## _deployment
 
-Auth system with both email and username, classic and API included.
+Everything that is needed to deploy with docker docker-compose
+
+## _users
+
+Minimalist user model with a proper admin model.
 
 ## _auth
 
@@ -37,3 +40,12 @@ Authentication system based on django-allauth
 
 Authentication ready to use out of the box for any SPA, it includes verifications
 via emails and some 'classic' views needed to handle this.
+
+## _quick_auth
+
+Authentication ready for both Django classic and DRF, works really good, but no social auth.
+It is the best solution here (better than _auth and _auth_api).
+
+## app_cdn
+
+A ready to go CDN app, for the admin.
