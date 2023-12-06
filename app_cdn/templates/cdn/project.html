@@ -71,9 +71,9 @@
       <div class="column">
         <span class="subtitle right mr-2">{{ item.category }}</span>
         {% if item.category == 'img' %}
-        <img src="{{item.file.url}}" alt="preview" class="image_preview">
+        <img src="{{ base_url }}/{{ item.file.name }}" alt="preview" class="image_preview">
         {% endif %}
-        <a href="{{ item.file.url }}" target="_blank" style="margin-left:50px;" class="url">{{ request.get_host }}{{ item.file.url }}</a>
+        <a href="{{ base_url }}/{{ item.file.name }}" target="_blank" style="margin-left:50px;" class="url">{{ base_url }}/{{ item.file.name }}</a>
       </div>
     </div>
     {% endfor %}

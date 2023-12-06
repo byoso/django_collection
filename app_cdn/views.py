@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.conf import settings
 from django.views.decorators.http import require_http_methods
 
+from .config import CDN_DIRECTORY
 
 @user_passes_test(lambda u: u.is_superuser)
 def home(request):
@@ -24,13 +25,6 @@ def new_project(request):
     if request.method == 'POST':
         form = ProjectForm(request.POST)
         if form.is_valid():
-            name = form.cleaned_data['name'].strip()
-            if name in settings.CDN_EXCLUDED_NAMES or "/" in name or Project.objects.filter(name=name).exists():
-                context = {
-                    'form': form,
-                    'error': "Project name already exists or is reserved, '/' is not allowed",
-                }
-                return render(request, 'cdn/new_project.html', context)
             form.save()
             projects = Project.objects.all()
             context = {
@@ -50,12 +44,17 @@ def project(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
     items = Item.objects.filter(project=project)
     absolute_url = request.build_absolute_uri()
+    base_url = f'http://{request.get_host()}'
+    if settings.DEBUG:
+        base_url += '/media'
     context = {
+        'base_url': base_url,
         'absolute_url': absolute_url,
         'project': project,
         'items': items,
     }
     return render(request, 'cdn/project.html', context)
+
 
 @user_passes_test(lambda u: u.is_superuser)
 def replace_item(request, item_id):
@@ -63,6 +62,9 @@ def replace_item(request, item_id):
     project = item.project
     category = item.category
     description = item.description
+    base_url = f'http://{request.get_host()}'
+    if settings.DEBUG:
+        base_url += '/media'
     if request.method == 'POST':
         form = ReplaceItemForm(request.POST, request.FILES)
         if form.is_valid():
@@ -80,6 +82,7 @@ def replace_item(request, item_id):
                 )
             return redirect('cdn:project', project_id=project.id)
         context = {
+            'base_url': base_url,
             'form': form,
             'item': item,
             'project': project,
@@ -87,6 +90,7 @@ def replace_item(request, item_id):
         return render(request, 'cdn/replace_item.html', {'form': form})
     form = ReplaceItemForm()
     context = {
+        'base_url': base_url,
         'item': item,
         'form': form,
         'project': project,
@@ -102,14 +106,6 @@ def edit_project(request, project_id):
         form = ProjectForm(request.POST)
         if form.is_valid():
             if project.name and form.cleaned_data['name'] != project.name:
-                name = form.cleaned_data['name'].strip()
-                if name in settings.CDN_EXCLUDED_NAMES or Project.objects.filter(name=name).exists():
-                    context = {
-                        'form': form,
-                        'project': project,
-                        'error': 'Project name already exists  or is reserved',
-                    }
-                    return render(request, 'cdn/edit_project.html', context)
                 shutil.move(os.path.join(settings.MEDIA_ROOT, project.name),
                             os.path.join(settings.MEDIA_ROOT, form.cleaned_data['name'].strip()))
                 items = Item.objects.filter(project=project)
@@ -138,8 +134,8 @@ def edit_project(request, project_id):
 @require_http_methods(['POST'])
 def delete_project(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
-    if os.path.exists(os.path.join(settings.MEDIA_ROOT, project.name)):
-        shutil.rmtree(os.path.join(settings.MEDIA_ROOT, project.name))
+    if os.path.exists(os.path.join(settings.MEDIA_ROOT, CDN_DIRECTORY, project.name)):
+        shutil.rmtree(os.path.join(settings.MEDIA_ROOT, CDN_DIRECTORY, project.name))
     project.delete()
     projects = Project.objects.all()
     context = {
@@ -180,17 +176,27 @@ def edit_item(request, item_id):
             # item.name = form.cleaned_data['name']
             if item.category != form.cleaned_data['category'].strip():
                 if not os.path.exists(
-                        os.path.join(settings.MEDIA_ROOT, project.name, form.cleaned_data['category'].strip())):
-                    os.mkdir(os.path.join(settings.MEDIA_ROOT, project.name, form.cleaned_data['category'].strip()))
+                        os.path.join(settings.MEDIA_ROOT, CDN_DIRECTORY, project.name, form.cleaned_data['category'].strip())):
+                    os.makedirs(os.path.join(settings.MEDIA_ROOT, CDN_DIRECTORY, project.name, form.cleaned_data['category'].strip()))
                 shutil.move(os.path.join(settings.MEDIA_ROOT, item.file.name),
-                            os.path.join(settings.MEDIA_ROOT, project.name, form.cleaned_data['category']))
-                item.file.name = project.name + '/' + form.cleaned_data['category'].strip() + '/' + item.file.name.split('/')[-1]
+                            os.path.join(settings.MEDIA_ROOT, CDN_DIRECTORY, project.name, form.cleaned_data['category']))
+                item.file.name = os.path.join(
+                    CDN_DIRECTORY,
+                    project.name,
+                    form.cleaned_data['category'].strip(),
+                    item.file.name.split('/')[-1]
+                    )
             item.category = form.cleaned_data['category'].strip()
             item.description = form.cleaned_data['description'].strip()
             item.save()
             return redirect('cdn:project', project_id=item.project.id)
     form = ItemEditForm(instance=item)
+
+    base_url = f'http://{request.get_host()}'
+    if settings.DEBUG:
+        base_url += '/media'
     context = {
+        'base_url': base_url,
         'item': item,
         'form': form,
         'project': project,

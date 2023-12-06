@@ -21,7 +21,6 @@ class ProjectForm(forms.ModelForm):
         }
 
 
-
 class ItemForm(forms.ModelForm):
     error_css_class = 'error'
 
@@ -34,6 +33,7 @@ class ItemForm(forms.ModelForm):
             'file': forms.FileInput(attrs={'class': 'button m-2', 'required': 'required'}),
             'description': forms.Textarea(attrs={'class': 'textarea m-2', 'placeholder': 'Item Description'}),
         }
+
 
 class ReplaceItemForm(forms.ModelForm):
     error_css_class = 'error'
@@ -48,6 +48,7 @@ class ReplaceItemForm(forms.ModelForm):
 
 class ItemEditForm(forms.ModelForm):
     error_css_class = 'error'
+
     class Meta:
         model = Item
         fields = ['category', 'description']

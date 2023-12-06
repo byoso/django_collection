@@ -2,12 +2,15 @@ import uuid
 from django.db import models
 from django.core.exceptions import ValidationError
 
+from . import config
+
 CATEGORIES = (
     ('js', 'JavaScript'),
     ('json', 'JSON'),
     ('css', 'CSS'),
     ('html', 'HTML'),
     ('img', 'Image'),
+    ('video', 'Video'),
     ('doc', 'Document'),
     ('other', 'Other'),
 )
@@ -33,7 +36,7 @@ class Project(models.Model):
 
 
 def item_directory(instance, filename):
-    return f'{instance.project.name}/{instance.category}/{filename}'
+    return f'{config.CDN_DIRECTORY}/{instance.project.name}/{instance.category}/{filename}'
 
 
 class Item(models.Model):
