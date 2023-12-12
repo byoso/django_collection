@@ -1,4 +1,4 @@
-# _quick_auth (v1.0.0)
+# _quick_auth (v1.0.1)
 
 Complete authentication system ready for a SPA or a classic Django project.
 
@@ -53,6 +53,29 @@ urlpatterns = [
 ```
 Take a look at '_quick_auth/templates/auth/demo.html' to see how you can add the login/signup/logout buttons in your own templates.
 
+**example**
+```html
+
+<div class="buttons">
+    {% if not user.is_authenticated %}
+    <a class="button is-primary" href="{% url 'signup' %}">
+        <strong>Sign up</strong>
+    </a>
+    <a class="button is-light" href="{% url 'login' %}">
+        Log in
+    </a>
+    {% else %}
+    <strong class="mr-2">{{ user.username }}</strong>
+    <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button class="button is-warning">
+        <strong>Logout</strong>
+        </button>
+    </form>
+    {% endif %}
+</div>
+```
+
 ## Installation for DRF
 
 
@@ -63,7 +86,7 @@ INSTALLED_APPS = [
     # ...
     'rest_framework',
     'rest_framework.authtoken',
-    
+
     '_quick_auth',
 
 ]

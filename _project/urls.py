@@ -19,12 +19,19 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from django.views.generic import TemplateView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('app_home.urls', namespace='home')),
     path('', include('_adminplus.urls', namespace='_adminplus')),
     path('app_cdn/', include('app_cdn.urls', namespace="cdn")),
-    path('accounts/', include('allauth.urls')),
+
+    # AUTHENTICATION URLS
+    # path('accounts/', include('allauth.urls')),  # allauth
+    path('', include('_quick_auth.urls')),
+    # only if you want to try the demo at path '/':
+    # path('', TemplateView.as_view(template_name='auth/demo.html')),
 ]
 
 if settings.DEBUG:

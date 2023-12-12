@@ -40,7 +40,7 @@ if conf['DJANGO_MODE'] == 'API':
         # api main endpoints
         path(f'{prefix}api_signup/', views_api.Signup.as_view(), name="api_signup"),
         path(f'{prefix}api_login/', views_api.LoginWithAuthToken.as_view(), name="api_login"),
-        path(f'{prefix}api_logout/', views_api.token_logout, name="token_logout"),
+        path(f'{prefix}api_logout/', views_api.token_logout, name="api_logout"),
 
         # api optionnal endpoints
         # path(

@@ -1,4 +1,4 @@
-# _users (v1.0.0)
+# _users (v1.0.1)
 
 This is just a very basic User.
 
