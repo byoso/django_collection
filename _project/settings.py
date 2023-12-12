@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "_deployment",
     'app_home',
     'app_cdn',
+    'app_site',
 
     '_users',
     '_quick_auth',

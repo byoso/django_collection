@@ -11,6 +11,10 @@ server {
         alias /vol/static/media/cdn;
     }
 
+    location /site {
+        alias /vol/static/media/sitefiles;
+    }
+
     location / {
         uwsgi_pass                  ${APP_HOST}:${APP_PORT};
         include                     /etc/nginx/uwsgi_params;

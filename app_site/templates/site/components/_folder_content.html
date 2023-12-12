@@ -1,0 +1,59 @@
+
+{% for item in content %}
+  {% if item.type == 'file' %}
+    <div class="columns file">
+      <div class="column">
+        <a href="{{ item.url }}" target="blank" class="">{{ item.name }}</a>
+      </div>
+      <div class="column">
+        <form action="{% url 'site:delete_item' project.id %}" method="post" class="right">
+          {% csrf_token %}
+          <input type="hidden" name="path" value="{{ item.path }}">
+          <input type="submit" value="X" class="button is-danger is-small">
+        </form>
+      </div>
+    </div>
+
+  {% endif %}
+
+  {% if item.type == 'folder' %}
+  <div class="folder-border">
+    <div class="columns">
+      <div class="column">
+        <form action="{% url 'site:delete_item' project.id %}" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="path" value="{{ item.path }}">
+          <input type="submit" value="X" class="button is-danger is-small ml-4 mr-4">
+          <span class="folder mb-2 mr-4">{{ item.name }}</span>
+        </form>
+
+      </div>
+      <div class="column">
+        <form method="post" action="{% url 'site:create_subfolder' project.id %}">
+            {% csrf_token %}
+
+          <input name="folder_name" type="text" placeholder="Folder name" style="height: 1.8rem;">
+          <input type="hidden" name="path" value="{{ item.path }}">
+          <input type="submit" value="+subfolder" class="button is-small">
+        </form>
+      </div>
+      <div class="column">
+        <form action="{% url 'site:add_file' project.id %}" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="file" name="file" class="button is-small">
+          <input type="hidden" name="path" value="{{ item.path }}">
+          <input type="submit" value="+file"  class="button is-small">
+        </form>
+
+      </div>
+    </div>
+
+      {% with item.content as content %}
+        {% include 'site/components/_folder_content.html' %}
+      {% endwith %}
+
+  </div>
+  {% endif %}
+
+
+{% endfor %}

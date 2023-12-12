@@ -49,3 +49,7 @@ It is the best solution here (better than _auth and _auth_api).
 ## app_cdn
 
 A ready to go CDN app, for the admin.
+
+## app_site
+
+Add and serve static sites instantly throught this app's interface.
